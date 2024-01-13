@@ -7,9 +7,7 @@ const RateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
-const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
-const { ExtractJwt } = require('passport-jwt');
+const passport = require('./auth/passportConfig');
 
 // Connect to MongoDB
 require('./database/mongoConfig');
