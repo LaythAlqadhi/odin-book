@@ -23,21 +23,32 @@ afterAll(async () => {
 });
 
 describe('POST /users/signup', () => {
+  const mockUserData = {
+    firstName: 'John',
+    lastName: 'Doe',
+    username: 'JohnDoe',
+    email: 'john.doe@example.com',
+    password: 'SecurePass123!',
+    passwordConfirmation: 'SecurePass123!',
+  };
+  
   it('creates a new user', async () => {
-    const mockUserData = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'JohnDoe',
-      email: 'john.doe@example.com',
-      password: 'SecurePass123!',
-      passwordConfirmation: 'SecurePass123!',
-    };
-    
     const res = await request(app)
       .post('/users/signup')
       .send(mockUserData);
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
+  });
+
+  it('retrives errors if any of the inputs is invalid', async () => {
+    // Modify firstName for an invalid request
+    mockUserData.firstName = '';
+    
+    const res = await request(app)
+      .post('/users/signup')
+      .send(mockUserData);
+    
+    expect(res.body.errors).toBeTruthy();
   });
 });
