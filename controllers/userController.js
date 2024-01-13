@@ -1,9 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 
-exports.postUser = [
+exports.user_signup_post = [
   body('firstName')
     .trim()
     .isLength({ min: 2 })
@@ -82,4 +84,53 @@ exports.postUser = [
     await user.save();
     res.status(200).json(user);
   }),
-]
+];
+
+exports.user_signin_post = [
+  body('username').trim().escape(),
+  
+  body('password').escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.json({ errors: errors.array() });
+    } else {
+      const user = await User.findOne({ username: req.body.username });
+      if (!user) {
+        res.json({
+          errors: [
+            {
+              msg: 'Incorrect username',
+              path: 'username',
+              value: req.body.username,
+            },
+          ],
+        });
+        return;
+      }
+
+      const match = await bcrypt.compare(req.body.password, user.password);
+      if (!match) {
+        res.json({
+          errors: [
+            {
+              msg: 'Incorrect password',
+              path: 'password',
+              value: req.body.password,
+            },
+          ],
+        });
+        return;
+      }
+
+      const payload = { sub: user.id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '6h',
+      });
+
+      res.status(200).json(token);
+    }
+  }),
+];

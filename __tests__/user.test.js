@@ -52,3 +52,30 @@ describe('POST /users/signup', () => {
     expect(res.body.errors).toBeTruthy();
   });
 });
+
+describe('POST /users/signin', () => {
+  const mockUserData = {
+    username: 'JohnDoe',
+    password: 'SecurePass123!',
+  };
+
+  it('signs in the user', async () => {
+    const res = await request(app)
+      .post('/users/signin')
+      .send(mockUserData);
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+  });
+
+  it('retrives errors if any of the inputs is invalid', async () => {
+    // Modify username for an invalid request
+    mockUserData.username = '';
+
+    const res = await request(app)
+      .post('/users/signin')
+      .send(mockUserData);
+
+    expect(res.body.errors).toBeTruthy();
+  });
+});
