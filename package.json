@@ -6,8 +6,7 @@
   },
   "private": true,
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest --watch",
     "start": "node ./bin/www.js",
     "devstart": "nodemon ./bin/www.js",
     "serverstart": "DEBUG=* npm run devstart",

@@ -13,8 +13,8 @@ const passport = require('./auth/passportConfig');
 require('./database/mongoConfig');
 
 // Define routes
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const indexRouter = require('./routes/indexRouter');
+const userRouter = require('./routes/userRouter');
 
 // Define models
 const User = require('./models/user');
@@ -32,28 +32,6 @@ const limiter = RateLimit({
   max: 20,
 });
 
-// JWT strategy configuration
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-};
-
-// Passport configuration
-passport.use(
-  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
-    try {
-      const user = await User.findById(jwtPayload.sub).exec();
-
-      if (user) {
-        return done(null, user);
-      }
-      return done(null, false);
-    } catch (err) {
-      return done(err, false);
-    }
-  }),
-);
-
 // Apply Express middleware
 app.use(limiter);
 app.use(passport.initialize());
@@ -68,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Define routes
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api', userRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
