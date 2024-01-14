@@ -157,7 +157,7 @@ exports.user_follow_request_post = [
       return;
     };
 
-    user.requests.push(req.user.id);
+    user.followRequests.push(req.user.id);
     await user.save();
     res.sendStatus(200);
   }),
