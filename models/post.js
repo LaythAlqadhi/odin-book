@@ -48,4 +48,4 @@ const postSchema = new Schema(
 
 postSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('User', postSchema);
+module.exports = mongoose.model('Post', postSchema);

@@ -15,6 +15,7 @@ require('./database/mongoConfig');
 // Define routes
 const indexRouter = require('./routes/indexRouter');
 const userRouter = require('./routes/userRouter');
+const postRouter = require('./routes/postRouter');
 
 // Define models
 const User = require('./models/user');
@@ -46,7 +47,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Define routes
 app.use('/', indexRouter);
-app.use('/api', userRouter);
+app.use('/v1', userRouter);
+app.use('/v1', postRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
