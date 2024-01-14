@@ -155,14 +155,59 @@ exports.postUserFollowRequest = [
     } else if (req.params.userId === req.user.id) {
       res.sendStatus(403);
       return;
-    };
+    } else if (user.followingRequests.includes(req.user.id)) {
+      res.sendStatus(400);
+      return;
+    }
 
-    user.followRequests.push(req.user.id);
+    user.followingRequests.push(req.user.id);
     await user.save();
     res.sendStatus(200);
   }),
 ];
 
-exports.postUserFollowResponse = [
-  
+exports.postUserFollowRespond = [
+  authenticate,
+
+  param('userId').isString().trim().escape(),
+  param('status').isString().trim().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.json({ errors: errors.array() });
+    }
+
+    const followRequester = await User.findById(req.params.userId);
+    if (!followRequester) {
+      res.sendStatus(404);
+      return;
+    } else if (req.params.userId === req.user.id) {
+      res.sendStatus(403);
+      return;
+    };
+
+    const followResponder = await User.findOne({
+      _id: req.user.id,
+      followingRequests: { $in: [req.params.userId] },
+    });
+
+    if (!followResponder) {
+      res.sendStatus(404);
+      return;
+    }
+
+    if (req.params.status === 'accepted') {
+        followRequester.following.push(req.user.id);
+      followResponder.followers.push(req.params.userId);
+      followResponder.followingRequests.pull(req.params.userId);
+    } else {
+      followResponder.followingRequests.pull(req.params.userId);
+    }
+    
+    await followRequester.save();
+    await followResponder.save();
+    res.sendStatus(200);
+  }),
 ];

@@ -14,7 +14,8 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/', userRouter);
 
-let token;
+let token1;
+let token2;
 let userId1;
 let userId2;
 
@@ -72,7 +73,7 @@ describe('POST /user/signin', () => {
       .send(mockUserData);
 
     // Save the token for another test
-    token = res.body;
+    token1 = res.body;
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
@@ -90,7 +91,7 @@ describe('POST /user/signin', () => {
   });
 });
 
-describe('POST /user/:userId', () => {
+describe('POST /user/:userId/follow-request', () => {
   it('requests a follow to another user', async () => {
     const mockUserData = {
       firstName: 'Sarah',
@@ -109,8 +110,8 @@ describe('POST /user/:userId', () => {
     userId2 = response.body.id;
     
     const res = await request(app)
-      .post(`/user/${userId2}`)
-      .auth(token, { type: 'bearer' });
+      .post(`/user/${userId2}/follow-request`)
+      .auth(token1, { type: 'bearer' });
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
@@ -118,17 +119,41 @@ describe('POST /user/:userId', () => {
 
   it('rejects invalid request', async () => {
     const res1 = await request(app)
-      .post(`/user/${userId2.slice(0, -2)}10`)
-      .auth(token, { type: 'bearer' });
+      .post(`/user/${userId2.slice(0, -2)}10/follow-request`)
+      .auth(token1, { type: 'bearer' });
 
     expect(res1.status).toBe(404);
     expect(res1.body.errors).toBeFalsy();
 
     const res2 = await request(app)
-      .post(`/user/${userId2}`)
-      .auth(`${token.slice(0, -2)}10`, { type: 'bearer' });
+      .post(`/user/${userId2}/follow-request`)
+      .auth(`${token1.slice(0, -2)}10`, { type: 'bearer' });
 
     expect(res2.status).toBe(401);
     expect(res2.body.errors).toBeFalsy();
+  });
+});
+
+describe('POST /user/:userId/follow-respond/:status', () => {
+  it('responses to the follow request', async () => {
+    // Sign in as the other user to respond to the following request
+    const mockUserData = {
+      username: 'SarahDoe',
+      password: 'SecurePass123!',
+    };
+
+    const response = await request(app)
+      .post('/user/signin')
+      .send(mockUserData);
+
+    // Save the token for another test
+    token2 = response.body;
+      
+    const res = await request(app)
+      .post(`/user/${userId1}/follow-respond/accepted`)
+      .auth(token2, { type: 'bearer' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
   });
 });

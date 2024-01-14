@@ -9,6 +9,6 @@ router.post('/user/signin', userController.postUserSignIn);
 
 router.post('/user/:userId/follow-request', userController.postUserFollowRequest);
 
-router.post('/user/:userId/follow-response', userController.postUserFollowResponse);
+router.post('/user/:userId/follow-respond/:status', userController.postUserFollowRespond);
 
 module.exports = router;
