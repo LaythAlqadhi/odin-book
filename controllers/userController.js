@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const authenticate = require('../auth/authenticate');
 const User = require('../models/user');
 
-exports.user_signup_post = [
+exports.postUserSignUp = [
   body('firstName')
     .trim()
     .isLength({ min: 2 })
@@ -87,7 +87,7 @@ exports.user_signup_post = [
   }),
 ];
 
-exports.user_signin_post = [
+exports.postUserSignIn = [
   body('username').trim().escape(),
   
   body('password').escape(),
@@ -136,7 +136,7 @@ exports.user_signin_post = [
   }),
 ];
 
-exports.user_follow_request_post = [
+exports.postUserFollowRequest = [
   authenticate,
   
   param('userId').isString().trim().escape(),
@@ -163,3 +163,6 @@ exports.user_follow_request_post = [
   }),
 ];
 
+exports.postUserFollowResponse = [
+  
+];
