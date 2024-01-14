@@ -156,4 +156,14 @@ describe('POST /user/:userId/follow-respond/:status', () => {
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
   });
+
+  it('rejects the follow request if theres something wrong', async () => {
+    // Set the user id the sane as the responder's
+    const res = await request(app)
+      .post(`/user/${userId2}/follow-respond/accepted`)
+      .auth(token2, { type: 'bearer' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.errors).toBeFalsy();
+  });
 });
