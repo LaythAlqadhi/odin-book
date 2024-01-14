@@ -26,7 +26,7 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
-describe('POST /users/signup', () => {
+describe('POST /user/signup', () => {
   const mockUserData = {
     firstName: 'John',
     lastName: 'Doe',
@@ -38,7 +38,7 @@ describe('POST /users/signup', () => {
   
   it('creates a new user', async () => {
     const res = await request(app)
-      .post('/users/signup')
+      .post('/user/signup')
       .send(mockUserData);
 
     // Save the user id for another test
@@ -53,14 +53,14 @@ describe('POST /users/signup', () => {
     mockUserData.firstName = '';
     
     const res = await request(app)
-      .post('/users/signup')
+      .post('/user/signup')
       .send(mockUserData);
     
     expect(res.body.errors).toBeTruthy();
   });
 });
 
-describe('POST /users/signin', () => {
+describe('POST /user/signin', () => {
   const mockUserData = {
     username: 'JohnDoe',
     password: 'SecurePass123!',
@@ -68,7 +68,7 @@ describe('POST /users/signin', () => {
 
   it('signs in the user', async () => {
     const res = await request(app)
-      .post('/users/signin')
+      .post('/user/signin')
       .send(mockUserData);
 
     // Save the token for another test
@@ -83,14 +83,14 @@ describe('POST /users/signin', () => {
     mockUserData.username = '';
 
     const res = await request(app)
-      .post('/users/signin')
+      .post('/user/signin')
       .send(mockUserData);
 
     expect(res.body.errors).toBeTruthy();
   });
 });
 
-describe('POST /users/:userId', () => {
+describe('POST /user/:userId', () => {
   it('requests a follow to another user', async () => {
     const mockUserData = {
       firstName: 'Sarah',
@@ -103,13 +103,13 @@ describe('POST /users/:userId', () => {
     
     // Create another user to send a request to
     const response = await request(app)
-      .post('/users/signup')
+      .post('/user/signup')
       .send(mockUserData);
 
     userId2 = response.body.id;
     
     const res = await request(app)
-      .post(`/users/${userId2}`)
+      .post(`/user/${userId2}`)
       .auth(token, { type: 'bearer' });
 
     expect(res.status).toBe(200);
@@ -118,14 +118,14 @@ describe('POST /users/:userId', () => {
 
   it('rejects invalid request', async () => {
     const res1 = await request(app)
-      .post(`/users/${userId2.slice(0, -2)}10`)
+      .post(`/user/${userId2.slice(0, -2)}10`)
       .auth(token, { type: 'bearer' });
 
     expect(res1.status).toBe(404);
     expect(res1.body.errors).toBeFalsy();
 
     const res2 = await request(app)
-      .post(`/users/${userId2}`)
+      .post(`/user/${userId2}`)
       .auth(`${token.slice(0, -2)}10`, { type: 'bearer' });
 
     expect(res2.status).toBe(401);
