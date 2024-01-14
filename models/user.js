@@ -31,11 +31,15 @@ const userSchema = new Schema(
       fullName: String,
       avatar: String,
     },
-    friends: [{
+    followers: [{
       type: Schema.Types.ObjectId,
       ref: 'User',
     }],
-    requests: [{
+    following: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    followRequests: [{
       type: Schema.Types.ObjectId,
       ref: 'User',
     }],
