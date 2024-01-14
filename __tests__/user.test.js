@@ -135,7 +135,7 @@ describe('POST /user/:userId/follow-request', () => {
 });
 
 describe('POST /user/:userId/follow-respond/:status', () => {
-  it('responses to the follow request', async () => {
+  it('respond to the follow request', async () => {
     // Sign in as the other user to respond to the following request
     const mockUserData = {
       username: 'SarahDoe',
