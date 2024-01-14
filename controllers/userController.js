@@ -70,6 +70,7 @@ exports.postUserSignUp = [
 
     if (!errors.isEmpty()) {
       res.send({ errors: errors.array() });
+      return;
     }
 
     const user = new User({
@@ -97,6 +98,7 @@ exports.postUserSignIn = [
 
     if (!errors.isEmpty()) {
       res.json({ errors: errors.array() });
+      return;
     }
 
     const user = await User.findOne({ username: req.body.username });
@@ -146,6 +148,7 @@ exports.postUserFollowRequest = [
 
     if (!errors.isEmpty()) {
       res.json({ errors: errors.array() });
+      return;
     }
 
     const user = await User.findById(req.params.userId);
@@ -177,6 +180,7 @@ exports.postUserFollowRespond = [
 
     if (!errors.isEmpty()) {
       res.json({ errors: errors.array() });
+      return;
     }
 
     const followRequester = await User.findById(req.params.userId);
