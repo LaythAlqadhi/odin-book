@@ -8,10 +8,6 @@ const Post = require('../models/post');
 exports.postCreateNewPost = [
   authenticate,
   
-  param('userId')
-    .trim()
-    .escape(),
-
   body('content')
     .trim()
     .notEmpty()
@@ -23,16 +19,13 @@ exports.postCreateNewPost = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
-    if (req.params.userId !== req.user.id) {
-      res.sendStatus(403);
-      return;
-    } else if (!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       res.send({ errors: errors.array() });
       return;
     }
 
     const post = new Post({
-      author: req.params.userId,
+      author: req.user.id,
       content: req.body.content,
     });
 

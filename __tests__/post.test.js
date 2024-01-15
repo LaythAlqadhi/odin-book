@@ -67,29 +67,18 @@ afterAll(async () => {
   await mongoose.disconnect();
 });
 
-describe('POST /post/:userId', () => {
+describe('POST /post', () => {
   const mockPost = {
     content: 'mockContent',
   };
   
   it('creates a new post', async () => {
     const res = await request(app)
-      .post(`/post/${userId1}`)
+      .post('/post')
       .auth(token1, { type: 'bearer' })
       .send(mockPost);
 
     expect(res.status).toBe(200);
-    expect(res.body.errors).toBeFalsy();
-  });
-
-  it('rejects post a new post if userId is incorrect', async () => {
-    // Change the userId to something incorrect
-    const res = await request(app)
-      .post(`/post/${userId1.slice(0, -2)}10`)
-      .auth(token1, { type: 'bearer' })
-      .send(mockPost);
-
-    expect(res.status).toBe(403);
     expect(res.body.errors).toBeFalsy();
   });
 
@@ -98,7 +87,7 @@ describe('POST /post/:userId', () => {
     mockPost.content = '';
     
     const res = await request(app)
-      .post(`/post/${userId1}`)
+      .post('/post')
       .auth(token1, { type: 'bearer' })
       .send(mockPost);
 
