@@ -119,3 +119,13 @@ exports.deletePost = [
   }),
 ];
 
+exports.getPosts = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find();
+
+  if (posts.length <= 0) {
+    res.sendStatus(404);
+    return;
+  }
+
+  res.status(200).json(posts);
+})

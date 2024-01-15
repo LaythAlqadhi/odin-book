@@ -101,9 +101,7 @@ describe('POST /post', () => {
 
 describe('GET /post/:postId', () => {
   it('gets a specific post correctly', async () => {
-    const res = await request(app)
-      .get(`/post/${postId}`)
-      .auth(token1, { type: 'bearer' })
+    const res = await request(app).get(`/post/${postId}`);
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
@@ -147,5 +145,34 @@ describe('Delete /post/:postId', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.errors).toBeFalsy();
+  });
+});
+
+describe('GET /posts', () => {
+  it('gets a list of all posts correctly', async () => {
+    const mockPost = {
+      content: 'mockContent',
+    };
+
+    const newPost = await request(app)
+      .post('/post')
+      .auth(token1, { type: 'bearer' })
+      .send(mockPost);
+
+    postId = newPost.body.id;
+    
+    const res = await request(app).get('/posts');
+
+    expect(res.status).toBe(200);
+  });
+  
+  it('retrieves a status 404 if no posts found', async () => {
+    const deletePost = await request(app)
+    .delete(`/post/${postId}`)
+    .auth(token1, { type: 'bearer' });
+    
+    const res = await request(app).get('/posts');
+
+    expect(res.status).toBe(404);
   });
 });
