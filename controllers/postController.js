@@ -33,10 +33,18 @@ exports.postCreateNewPost = [
   }),
 ];
 
-exports.deletePost = [
+exports.patchPost = [
   authenticate,
 
   param('postId').trim().notEmpty().escape(),
+
+  body('content')
+  .trim()
+  .notEmpty()
+  .withMessage('Content must not be empty.')
+  .isLength({ max: 2500 })
+  .withMessage('Content must not be greater than 2500 characters.')
+  .escape(),
 
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
@@ -55,8 +63,36 @@ exports.deletePost = [
       res.sendStatus(403);
       return;
     }
-    
-    await Post.findByIdAndDelete(req.params.postId);
+
+    post.content = req.body.content;
+    await post.save();
+    res.status(200).json(post);
+  }),
+];
+
+exports.deletePost = [
+  authenticate,
+
+  param('postId').trim().notEmpty().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.send({ errors: errors.array() });
+      return;
+    }
+
+    const post = await Post.findOneAndDelete({
+      _id: req.params.postId,
+      author: req.user.id,
+    });
+
+    if (!post) {
+      res.sendStatus(403);
+      return;
+    }
+
     res.sendStatus(200);
   }),
 ];
