@@ -99,6 +99,17 @@ describe('POST /post', () => {
   });
 });
 
+describe('GET /post/:postId', () => {
+  it('gets a specific post correctly', async () => {
+    const res = await request(app)
+      .get(`/post/${postId}`)
+      .auth(token1, { type: 'bearer' })
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+  });
+});
+
 describe('Patch /post/:postId', () => {
   const mockEditedContent = {
     content: 'mockEditedContent',
@@ -117,7 +128,6 @@ describe('Patch /post/:postId', () => {
     expect(res.body.content).toBe('mockEditedContent');
   });
 });
-
 
 describe('Delete /post/:postId', () => {
   it('removes a specific post correctly', async () => {
