@@ -20,6 +20,7 @@ let token1;
 let token2;
 let userId1;
 let userId2;
+let postId;
 
 beforeAll(async () => {
   await initializeMongoServer();
@@ -78,6 +79,8 @@ describe('POST /post', () => {
       .auth(token1, { type: 'bearer' })
       .send(mockPost);
 
+    postId = res.body.id
+
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
   });
@@ -93,5 +96,26 @@ describe('POST /post', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeTruthy();
+  });
+});
+
+describe('Delete /post/:postId', () => {
+  it('removes a specific post correctly', async () => {
+    const res = await request(app)
+      .delete(`/post/${postId}`)
+      .auth(token1, { type: 'bearer' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+  });
+
+  it('will not remove the post if the request is not from the owner', async () => {
+    // Changing the auth token to simulate a request from a different user
+    const res = await request(app)
+      .delete(`/post/${postId}`)
+      .auth(token2, { type: 'bearer' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.errors).toBeFalsy();
   });
 });

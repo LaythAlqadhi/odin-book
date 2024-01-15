@@ -2,7 +2,6 @@ const asyncHandler = require('express-async-handler');
 const { body, param, validationResult } = require('express-validator');
 
 const authenticate = require('../auth/authenticate');
-const User = require('../models/user');
 const Post = require('../models/post');
 
 exports.postCreateNewPost = [
@@ -33,3 +32,32 @@ exports.postCreateNewPost = [
     res.status(200).json(post);
   }),
 ];
+
+exports.deletePost = [
+  authenticate,
+
+  param('postId').trim().notEmpty().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.send({ errors: errors.array() });
+      return;
+    }
+
+    const post = await Post.findOne({
+      _id: req.params.postId,
+      author: req.user.id,
+    });
+
+    if (!post) {
+      res.sendStatus(403);
+      return;
+    }
+    
+    await Post.findByIdAndDelete(req.params.postId);
+    res.sendStatus(200);
+  }),
+];
+
