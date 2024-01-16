@@ -14,6 +14,7 @@ require('./database/mongoConfig');
 
 // Define routes
 const indexRouter = require('./routes/indexRouter');
+const authRouter = require('./routes/authRouter');
 const userRouter = require('./routes/userRouter');
 const postRouter = require('./routes/postRouter');
 
@@ -47,6 +48,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Define routes
 app.use('/', indexRouter);
+app.use('/v1', authRouter);
 app.use('/v1', userRouter);
 app.use('/v1', postRouter);
 

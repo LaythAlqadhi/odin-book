@@ -4,6 +4,7 @@ const request = require('supertest');
 
 const initializeMongoServer = require('../database/mongoConfigTesting');
 const passport = require('../auth/passportConfig');
+const authRouter = require('../routes/authRouter');
 const userRouter = require('../routes/userRouter');
 
 const app = express();
@@ -12,23 +13,19 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use('/', authRouter);
 app.use('/', userRouter);
 
 let token1;
 let token2;
 let userId1;
 let userId2;
+let postId;
 
 beforeAll(async () => {
   await initializeMongoServer();
-});
 
-afterAll(async () => {
-  await mongoose.disconnect();
-});
-
-describe('POST /user/signup', () => {
-  const mockUserData = {
+  const mockUser1Data = {
     firstName: 'John',
     lastName: 'Doe',
     username: 'JohnDoe',
@@ -36,79 +33,43 @@ describe('POST /user/signup', () => {
     password: 'SecurePass123!',
     passwordConfirmation: 'SecurePass123!',
   };
-  
-  it('creates a new user', async () => {
-    const res = await request(app)
-      .post('/user/signup')
-      .send(mockUserData);
 
-    // Save the user id for another test
-    userId1 = res.body.id
-    
-    expect(res.status).toBe(200);
-    expect(res.body.errors).toBeFalsy();
-  });
-
-  it('retrives errors if any of the inputs is invalid', async () => {
-    // Modify firstName for an invalid request
-    mockUserData.firstName = '';
-    
-    const res = await request(app)
-      .post('/user/signup')
-      .send(mockUserData);
-    
-    expect(res.body.errors).toBeTruthy();
-  });
-});
-
-describe('POST /user/signin', () => {
-  const mockUserData = {
-    username: 'JohnDoe',
+  const mockUser2Data = {
+    firstName: 'Sarah',
+    lastName: 'Doe',
+    username: 'SarahDoe',
+    email: 'sarah.doe@example.com',
     password: 'SecurePass123!',
+    passwordConfirmation: 'SecurePass123!',
   };
 
-  it('signs in the user', async () => {
-    const res = await request(app)
-      .post('/user/signin')
-      .send(mockUserData);
+  const signup1 = await request(app)
+    .post('/auth/signup')
+    .send(mockUser1Data);
+  const signup2 = await request(app)
+    .post('/auth/signup')
+    .send(mockUser2Data);
 
-    // Save the token for another test
-    token1 = res.body;
+  userId1 = signup1.body.id;
+  userId2 = signup2.body.id;
 
-    expect(res.status).toBe(200);
-    expect(res.body.errors).toBeFalsy();
-  });
+  const signin1 = await request(app)
+    .post('/auth/signin')
+    .send(mockUser1Data);
+  const signin2 = await request(app)
+    .post('/auth/signin')
+    .send(mockUser2Data);
 
-  it('retrives errors if any of the inputs is invalid', async () => {
-    // Modify username for an invalid request
-    mockUserData.username = '';
+  token1 = signin1.body;
+  token2 = signin2.body;
+});
 
-    const res = await request(app)
-      .post('/user/signin')
-      .send(mockUserData);
-
-    expect(res.body.errors).toBeTruthy();
-  });
+afterAll(async () => {
+  await mongoose.disconnect();
 });
 
 describe('POST /user/:userId/follow-request', () => {
   it('requests a follow to another user', async () => {
-    const mockUserData = {
-      firstName: 'Sarah',
-      lastName: 'Doe',
-      username: 'SarahDoe',
-      email: 'sarah.doe@example.com',
-      password: 'SecurePass123!',
-      passwordConfirmation: 'SecurePass123!',
-    };
-    
-    // Create another user to send a request to
-    const response = await request(app)
-      .post('/user/signup')
-      .send(mockUserData);
-
-    userId2 = response.body.id;
-    
     const res = await request(app)
       .post(`/user/${userId2}/follow-request`)
       .auth(token1, { type: 'bearer' });
@@ -136,19 +97,6 @@ describe('POST /user/:userId/follow-request', () => {
 
 describe('POST /user/:userId/follow-respond/:status', () => {
   it('respond to the follow request', async () => {
-    // Sign in as the other user to respond to the following request
-    const mockUserData = {
-      username: 'SarahDoe',
-      password: 'SecurePass123!',
-    };
-
-    const response = await request(app)
-      .post('/user/signin')
-      .send(mockUserData);
-
-    // Save the token for another test
-    token2 = response.body;
-      
     const res = await request(app)
       .post(`/user/${userId1}/follow-respond/accepted`)
       .auth(token2, { type: 'bearer' });

@@ -4,7 +4,7 @@ const request = require('supertest');
 
 const initializeMongoServer = require('../database/mongoConfigTesting');
 const passport = require('../auth/passportConfig');
-const userRouter = require('../routes/userRouter');
+const authRouter = require('../routes/authRouter');
 const postRouter = require('../routes/postRouter');
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/', userRouter);
+app.use('/', authRouter);
 app.use('/', postRouter);
 
 let token1;
@@ -44,20 +44,20 @@ beforeAll(async () => {
   };
 
   const signup1 = await request(app)
-    .post('/user/signup')
+    .post('/auth/signup')
     .send(mockUser1Data);
   const signup2 = await request(app)
-    .post('/user/signup')
+    .post('/auth/signup')
     .send(mockUser2Data);
 
   userId1 = signup1.body.id;
   userId2 = signup2.body.id;
 
   const signin1 = await request(app)
-    .post('/user/signin')
+    .post('/auth/signin')
     .send(mockUser1Data);
   const signin2 = await request(app)
-    .post('/user/signin')
+    .post('/auth/signin')
     .send(mockUser2Data);
 
   token1 = signin1.body;
