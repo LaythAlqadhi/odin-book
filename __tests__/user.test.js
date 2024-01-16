@@ -106,12 +106,74 @@ describe('POST /user/:userId/follow-respond/:status', () => {
   });
 
   it('rejects the follow request if theres something wrong', async () => {
-    // Set the user id the sane as the responder's
+    // Set the user id the same as the responder's
     const res = await request(app)
       .post(`/user/${userId2}/follow-respond/accepted`)
       .auth(token2, { type: 'bearer' });
 
     expect(res.status).toBe(403);
     expect(res.body.errors).toBeFalsy();
+  });
+});
+
+describe('GET /user/:userId', () => {
+  it('gets a specific user', async () => {
+    const res = await request(app).get(`/user/${userId1}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+    expect(res.body.user).toBeTruthy();
+  });
+});
+
+describe('GET /user/:userId/followers', () => {
+  it('gets a list of a specific user followers', async () => {
+    const res = await request(app).get(`/user/${userId1}/followers`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+    expect(res.body.users).toBeTruthy();
+  });
+});
+
+describe('GET /user/:userId/following', () => {
+  it('gets a list of a specific user following', async () => {
+    const res = await request(app).get(`/user/${userId1}/following`);
+    
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+    expect(res.body.users).toBeTruthy();
+  });
+});
+
+describe('GET /user/:userId/followingRequests', () => {
+  it('gets a list of a specific user following', async () => {
+    const res = await request(app)
+      .get(`/user/${userId1}/followingRequests`)
+      .auth(token1, { type: 'bearer' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.errors).toBeFalsy();
+    expect(res.body.users).toBeTruthy();
+  });
+
+  it('will not get a list if the user is not allowed to access it', async () => {
+    // Set token that not match the userId
+    const res = await request(app)
+      .get(`/user/${userId1}/followingRequests`)
+      .auth(token2, { type: 'bearer' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.errors).toBeFalsy();
+    expect(res.body.users).toBeFalsy();
+  });
+});
+
+describe('GET /users', () => {
+  it('gets a list of users', async () => {
+    const res = await request(app).get('/users');
+
+    expect(res.status).toBe(200);
+    expect(res.body.users).toBeTruthy();
   });
 });

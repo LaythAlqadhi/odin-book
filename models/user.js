@@ -20,14 +20,8 @@ const userSchema = new Schema(
       required: true,
     },
     profile: {
-      firstName: {
-        type: String,
-        required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
+      firstName: String,
+      lastName: String,
       fullName: String,
       avatar: String,
     },
@@ -48,6 +42,10 @@ const userSchema = new Schema(
 );
 
 userSchema.pre('save', function updateFullName(next) {
+  if (!this.isModified('profile.firstName') || !this.isModified('profile.lastName')) {
+    return next();
+  }
+  
   this.profile.fullName = `${this.profile.firstName} ${this.profile.lastName}`;
   next();
 });
