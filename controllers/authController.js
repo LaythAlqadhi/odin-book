@@ -117,3 +117,21 @@ exports.postAuthSignIn = [
     })(req, res, next);
   },
 ];
+
+exports.postAuthGithub = passport.authenticate('github', { scope: [ 'user:email' ] });
+
+exports.postAuthGithubCB = (req, res, next) => {
+  passport.authenticate('github', { session: false }, (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!user) {
+      return res.status(401).json({ message: 'Authentication failed' });
+    }
+
+    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { expiresIn: '6h' });
+
+    return res.status(200).json(token);
+  })(req, res, next);
+};
