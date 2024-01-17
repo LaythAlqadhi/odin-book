@@ -50,8 +50,8 @@ beforeAll(async () => {
     .post('/auth/signup')
     .send(mockUser2Data);
 
-  userId1 = signup1.body.id;
-  userId2 = signup2.body.id;
+  userId1 = signup1.body.user.id;
+  userId2 = signup2.body.user.id;
 
   const signin1 = await request(app)
     .post('/auth/signin')
@@ -60,8 +60,8 @@ beforeAll(async () => {
     .post('/auth/signin')
     .send(mockUser2Data);
 
-  token1 = signin1.body;
-  token2 = signin2.body;
+  token1 = signin1.body.token;
+  token2 = signin2.body.token;
 });
 
 afterAll(async () => {
@@ -79,7 +79,7 @@ describe('POST /post', () => {
       .auth(token1, { type: 'bearer' })
       .send(mockPost);
 
-    postId = res.body.id
+    postId = res.body.post.id;
 
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
@@ -122,8 +122,8 @@ describe('Patch /post/:postId', () => {
     expect(res.status).toBe(200);
     expect(res.body.errors).toBeFalsy();
     
-    expect(res.body.content).not.toBe('mockContent');
-    expect(res.body.content).toBe('mockEditedContent');
+    expect(res.body.post.content).not.toBe('mockContent');
+    expect(res.body.post.content).toBe('mockEditedContent');
   });
 });
 
@@ -159,7 +159,7 @@ describe('GET /posts', () => {
       .auth(token1, { type: 'bearer' })
       .send(mockPost);
 
-    postId = newPost.body.id;
+    postId = newPost.body.post.id;
     
     const res = await request(app).get('/posts');
 

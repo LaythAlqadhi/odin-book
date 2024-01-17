@@ -50,8 +50,8 @@ beforeAll(async () => {
     .post('/auth/signup')
     .send(mockUser2Data);
 
-  userId1 = signup1.body.id;
-  userId2 = signup2.body.id;
+  userId1 = signup1.body.user.id;
+  userId2 = signup2.body.user.id;
 
   const signin1 = await request(app)
     .post('/auth/signin')
@@ -60,8 +60,8 @@ beforeAll(async () => {
     .post('/auth/signin')
     .send(mockUser2Data);
 
-  token1 = signin1.body;
-  token2 = signin2.body;
+  token1 = signin1.body.token;
+  token2 = signin2.body.token;
 });
 
 afterAll(async () => {

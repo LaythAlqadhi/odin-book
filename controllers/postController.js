@@ -22,7 +22,7 @@ exports.getPost = [
       return;
     }
 
-    res.status(200).json(post);
+    res.status(200).json({ post });
   }),
 ];
 
@@ -51,7 +51,7 @@ exports.postCreateNewPost = [
     });
 
     await post.save();
-    res.status(200).json(post);
+    res.status(200).json({ post });
   }),
 ];
 
@@ -88,7 +88,7 @@ exports.patchPost = [
 
     post.content = req.body.content;
     await post.save();
-    res.status(200).json(post);
+    res.status(200).json({ post });
   }),
 ];
 
@@ -127,5 +127,5 @@ exports.getPosts = asyncHandler(async (req, res, next) => {
     return;
   }
 
-  res.status(200).json(posts);
+  res.status(200).json({ posts });
 })

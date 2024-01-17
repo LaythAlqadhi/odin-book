@@ -84,7 +84,7 @@ exports.postUserSignUp = [
     });
 
     await user.save();
-    res.status(200).json(user);
+    res.status(200).json({ user });
   }),
 ];
 
@@ -134,7 +134,7 @@ exports.postUserSignIn = [
       expiresIn: '6h',
     });
 
-    res.status(200).json(token);
+    res.status(200).json({ token });
   }),
 ];
 

@@ -85,7 +85,7 @@ exports.postAuthSignUp = [
     });
 
     await user.save();
-    res.status(200).json(user);
+    res.status(200).json({ user });
   }),
 ];
 
@@ -113,7 +113,7 @@ exports.postAuthSignIn = [
 
       const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { expiresIn: '6h' });
 
-      return res.status(200).json(token);
+      return res.status(200).json({ token });
     })(req, res, next);
   },
 ];
@@ -132,6 +132,6 @@ exports.postAuthGithubCB = (req, res, next) => {
 
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { expiresIn: '6h' });
 
-    return res.status(200).json(token);
+    return res.status(200).json({ token });
   })(req, res, next);
 };
