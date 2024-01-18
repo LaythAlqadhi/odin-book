@@ -118,9 +118,9 @@ exports.postAuthSignIn = [
   },
 ];
 
-exports.postAuthGithub = passport.authenticate('github', { scope: [ 'user:email' ] });
+exports.getAuthGithub = passport.authenticate('github', { scope: [ 'user:email' ] });
 
-exports.postAuthGithubCB = (req, res, next) => {
+exports.getAuthGithubCB = (req, res, next) => {
   passport.authenticate('github', { session: false }, (err, user) => {
     if (err) {
       return res.status(500).json({ error: err.message });
