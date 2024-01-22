@@ -3,10 +3,10 @@ const bcrypt = require('bcryptjs');
 const { faker } = require('@faker-js/faker');
 
 // Connect to MongoDB
-require('./database/mongoConfig');
+require('../database/mongoConfig');
 
-const User = require('./models/user');
-const Post = require('./models/post');
+const User = require('../models/user');
+const Post = require('../models/post');
 
 const NUM_USERS = 20;
 const NUM_POSTS_PER_USER = 5;
@@ -25,9 +25,9 @@ async function seedData() {
       email: faker.internet.email(),
       password: faker.internet.password(),
       profile: {
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
+        displayName: faker.person.fullName(),
         avatar: faker.image.avatar(),
+        bio: faker.person.bio(),
       },
     });
 
