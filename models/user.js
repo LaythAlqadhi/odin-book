@@ -5,25 +5,30 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
+    githubId: {
+      type: String,
+      unique: true,
+    },
     username: {
       type: String,
-      required: true,
       unique: true,
+      maxLength: 25,
     },
     email: {
       type: String,
-      required: true,
       unique: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    password: String,
     profile: {
-      firstName: String,
-      lastName: String,
-      fullName: String,
+      displayName: {
+        type: String,
+        maxLength: 25,
+      },
       avatar: String,
+      bio: {
+        type: String,
+        maxLength: 150,
+      },
     },
     followers: [{
       type: Schema.Types.ObjectId,
@@ -40,15 +45,6 @@ const userSchema = new Schema(
   },
   { timestamps: true },
 );
-
-userSchema.pre('save', function updateFullName(next) {
-  if (!this.isModified('profile.firstName') || !this.isModified('profile.lastName')) {
-    return next();
-  }
-  
-  this.profile.fullName = `${this.profile.firstName} ${this.profile.lastName}`;
-  next();
-});
 
 userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) {
