@@ -39,11 +39,36 @@ async function seedData() {
     console.log(`${NUM_USERS} users seeded successfully.`);
 
     for (const user of users) {
+      const followers = [];
+      for (let i = 0; i < NUM_USERS / 2; i++) {
+        followers.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
+      }
+
+      const following = [];
+      for (let i = 0; i < NUM_USERS / 2; i++) {
+        following.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
+      }
+
+      const followingRequests = [];
+      for (let i = 0; i < NUM_USERS / 2; i++) {
+        followingRequests.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
+      }
+
+      user.followers = followers;
+      user.following = following;
+      user.followingRequests = followingRequests;
+
+      await user.save();
+    }
+    
+    console.log(`User relationships seeded successfully.`);
+    
+    for (const user of users) {
       const posts = [];
 
       for (let i = 0; i < NUM_POSTS_PER_USER; i++) {
         const post = new Post({
-          author: user._id,
+          author: user['_id'],
           content: faker.lorem.paragraph(),
           likes: faker.number.int({ min: 0, max: 2000 }),
         });
@@ -74,5 +99,4 @@ async function seedData() {
   }
 }
 
-// Call the function to seed users and posts
 seedData();
