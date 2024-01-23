@@ -15,7 +15,18 @@ exports.getPost = [
       return;
     }
 
-    const post = await Post.findById(req.params.postId);
+    const post = await Post.findById(req.params.postId)
+    .populate({
+      path: 'author',
+      select: 'username profile',
+    })
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'author',
+        select: 'username profile',
+      },
+    });
 
     if (!post) {
       res.sendStatus(404);
@@ -120,7 +131,18 @@ exports.deletePost = [
 ];
 
 exports.getPosts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find();
+  const posts = await Post.find({})
+    .populate({
+      path: 'author',
+      select: 'username profile',
+    })
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'author',
+        select: 'username profile',
+      },
+    });
 
   if (posts.length <= 0) {
     res.sendStatus(404);
