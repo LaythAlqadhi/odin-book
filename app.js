@@ -7,7 +7,11 @@ const RateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
+const cloudinary = require('cloudinary').v2;
 const passport = require('./auth/passportConfig');
+
+// Configure Cloudinary
+cloudinary.config({ secure: true });
 
 // Connect to MongoDB
 require('./database/mongoConfig');
@@ -15,11 +19,8 @@ require('./database/mongoConfig');
 // Define routes
 const indexRouter = require('./routes/indexRouter');
 const authRouter = require('./routes/authRouter');
-const userRouter = require('./routes/userRouter');
-const postRouter = require('./routes/postRouter');
-
-// Define models
-const User = require('./models/user');
+const usersRouter = require('./routes/usersRouter');
+const postsRouter = require('./routes/postsRouter');
 
 // Create Express app
 const app = express();
@@ -31,7 +32,7 @@ app.set('view engine', 'pug');
 // Rate limiting
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 20,
+  max: 90,
 });
 
 // Apply Express middleware
@@ -49,8 +50,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Define routes
 app.use('/', indexRouter);
 app.use('/v1', authRouter);
-app.use('/v1', userRouter);
-app.use('/v1', postRouter);
+app.use('/v1', usersRouter);
+app.use('/v1', postsRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
