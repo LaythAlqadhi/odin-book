@@ -24,29 +24,44 @@ const userSchema = new Schema(
         type: String,
         maxLength: 25,
       },
-      avatar: String,
+      avatar: {
+        type: String,
+        default: process.env.DEFAULT_AVATAR,
+      },
       bio: {
         type: String,
         maxLength: 150,
       },
     },
-    followers: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
-    following: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
-    followingRequests: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
+    followers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    following: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    followingRequests: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    posts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Post',
+      },
+    ],
   },
   { timestamps: true },
 );
 
-userSchema.pre('save', async function hashPassword(next) {
+async function hashPassword(next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -58,7 +73,10 @@ userSchema.pre('save', async function hashPassword(next) {
   } catch (error) {
     return next(error);
   }
-});
+}
+
+userSchema.pre('save', hashPassword);
+userSchema.pre('update', hashPassword);
 
 userSchema.set('toJSON', { virtuals: true });
 
