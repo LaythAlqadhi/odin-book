@@ -142,7 +142,7 @@ exports.getAuthGithub = passport.authenticate('github');
 exports.getAuthGithubCB = [
   passport.authenticate('github', {
     session: false,
-    failureRedirect: `${process.env.CLIENT_URL}/auth/failure`,
+    failureRedirect: process.env.CLIENT_URL,
   }),
 
   (req, res) => {
