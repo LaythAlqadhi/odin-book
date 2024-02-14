@@ -5,19 +5,14 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
-    githubId: {
-      type: String,
-      unique: true,
-    },
+    githubId: String,
     username: {
       type: String,
       unique: true,
       maxLength: 25,
+      required: true,
     },
-    email: {
-      type: String,
-      unique: true,
-    },
+    email: String,
     password: String,
     profile: {
       displayName: {
