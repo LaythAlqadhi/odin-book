@@ -60,15 +60,14 @@ passport.use(
     githubOptions,
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.error(profile);
         const defaultUser = {
           githubId: profile.id,
           username: profile.username,
-          email: profile._json.email,
+          ...(profile?._json.email && { email: profile._json.email }),
           profile: {
-            displayName: profile.displayName,
-            avatar: profile.photos[0].value,
-            bio: profile._json.bio,
+            ...(profile?.displayName && { displayName: profile.displayName }),
+            ...(profile?.photos[0].value && { avatar: profile.photos[0].value }),
+            ...(profile?._json.bio && { bio: profile._json.bio }),
           },
         };
 
