@@ -149,8 +149,6 @@ exports.getAuthGithubCB = [
     const token = jwt.sign({ sub: req.user.id }, process.env.JWT_SECRET, {
       expiresIn: '6h',
     });
-
-    res.cookie('token', token);
-    res.redirect(process.env.CLIENT_URL);
+    res.redirect(`${process.env.CLIENT_URL}/auth?token=${token}&id=${req.user.id}&username=${req.user.username}`);
   },
 ];
