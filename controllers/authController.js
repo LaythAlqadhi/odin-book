@@ -113,8 +113,8 @@ exports.postAuthSignIn = [
 
 exports.getAuthDemo = [
   (req, res, next) => {
-    req.body.username = 'Leo79';
-    req.body.password = 'DDpDzYJaaRdOvyC';
+    req.body.username = 'JohnDoe';
+    req.body.password = 'SecurePass!123';
 
     next();
   },
