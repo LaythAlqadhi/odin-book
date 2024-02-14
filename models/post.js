@@ -29,6 +29,14 @@ const postSchema = new Schema(
   { timestamps: true },
 );
 
+postSchema.pre('save', function validateContent(next) {
+  if (!(this.content.media || this.content.text)) {
+    const err = new Error('Post content must have either media or text.');
+    return next(err);
+  }
+  next();
+});
+
 postSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Post', postSchema);
