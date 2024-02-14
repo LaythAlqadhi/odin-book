@@ -7,94 +7,138 @@ require('../database/mongoConfig');
 
 const User = require('../models/user');
 const Post = require('../models/post');
+const Comment = require('../models/comment');
 
-const NUM_USERS = 20;
-const NUM_POSTS_PER_USER = 5;
-const NUM_COMMENTS_PER_POST = 3;
+const NUM_USERS = 25;
+const NUM_POSTS_PER_USER = 100;
+const NUM_COMMENTS_PER_POST = 100;
+
+const randomNum = (maxLength) =>
+  faker.number.int({ min: 0, max: maxLength - 1 });
 
 async function seedData() {
   await User.deleteMany({});
   await Post.deleteMany({});
-  
-  const users = [];
-
-  for (let i = 0; i < NUM_USERS; i++) {
-    const user = new User({
-      githubId: faker.string.uuid(),
-      username: faker.internet.userName(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-      profile: {
-        displayName: faker.person.fullName(),
-        avatar: faker.image.avatar(),
-        bio: faker.person.bio(),
-      },
-    });
-
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    user.password = hashedPassword;
-
-    users.push(user);
-  }
+  await Comment.deleteMany({});
 
   try {
+    const users = [];
+    for (let i = 0; i < NUM_USERS; i++) {
+      const user = new User({
+        githubId: faker.string.uuid(),
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        profile: {
+          displayName: faker.person.fullName(),
+          avatar: faker.image.avatar(),
+          bio: faker.person.bio(),
+        },
+        followers: [],
+        following: [],
+        followingRequests: [],
+        posts: [],
+      });
+
+      console.log(user);
+      user.password = await bcrypt.hash(user.password, 10);
+      users.push(user);
+    }
+
     await User.insertMany(users);
     console.log(`${NUM_USERS} users seeded successfully.`);
 
-    for (const user of users) {
+    for (let i = 0; i < users.length; i++) {
+      const currentUser = users[i];
       const followers = [];
-      for (let i = 0; i < NUM_USERS / 2; i++) {
-        followers.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
-      }
-
       const following = [];
-      for (let i = 0; i < NUM_USERS / 2; i++) {
-        following.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
-      }
-
       const followingRequests = [];
-      for (let i = 0; i < NUM_USERS / 2; i++) {
-        followingRequests.push(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']);
-      }
 
-      user.followers = followers;
-      user.following = following;
-      user.followingRequests = followingRequests;
+      for (let j = 0; j < NUM_USERS / 2; j++) {
+        const randomFollower = users[randomNum(NUM_USERS)].id;
+        followers.push(randomFollower);
 
-      await user.save();
-    }
-    
-    console.log(`User relationships seeded successfully.`);
-    
-    for (const user of users) {
-      const posts = [];
-
-      for (let i = 0; i < NUM_POSTS_PER_USER; i++) {
-        const post = new Post({
-          author: user['_id'],
-          content: faker.lorem.paragraph(),
-          likes: faker.number.int({ min: 0, max: 2000 }),
-        });
-
-        const comments = [];
-        for (let j = 0; j < NUM_COMMENTS_PER_POST; j++) {
-          const comment = {
-            author: new mongoose.Types.ObjectId(users[faker.number.int({ min: 0, max: NUM_USERS - 1 })]['_id']),
-            post: new mongoose.Types.ObjectId(users[faker.number.int({ min: 0, max: users.length - 1 })]['_id']),
-            content: faker.lorem.sentence(),
-            likes: faker.number.int({ min: 0, max: 2000 }),
-          };
-          comments.push(comment);
+        const followerIndex = users.findIndex(
+          (user) => user.id === randomFollower,
+        );
+        if (followerIndex !== -1) {
+          users[followerIndex].following.push(currentUser.id);
         }
-
-        post.comments = comments;
-        posts.push(post);
       }
 
-      await Post.insertMany(posts);
+      for (let j = 0; j < NUM_USERS / 2; j++) {
+        const randomFollowing = users[randomNum(NUM_USERS)].id;
+        following.push(randomFollowing);
+
+        const followingIndex = users.findIndex(
+          (user) => user.id === randomFollowing,
+        );
+        if (followingIndex !== -1) {
+          users[followingIndex].followers.push(currentUser.id);
+        }
+      }
+
+      for (let j = 0; j < NUM_USERS / 2; j++) {
+        followingRequests.push(users[randomNum(NUM_USERS)].id);
+      }
+
+      currentUser.followers = followers;
+      currentUser.following = following;
+      currentUser.followingRequests = followingRequests;
+
+      await currentUser.save();
     }
 
-    console.log(`${NUM_POSTS_PER_USER * NUM_USERS} posts seeded successfully.`);
+    console.log(`User relationships seeded successfully.`);
+
+    const posts = [];
+    for (let i = 0; i < NUM_POSTS_PER_USER; i++) {
+      const userIndex = randomNum(NUM_USERS);
+
+      const post = new Post({
+        author: users[userIndex].id,
+        content: {
+          ...(Math.random() < 0.5 && { media: faker.image.urlLoremFlickr() }),
+          text: faker.lorem.paragraph(),
+        },
+        likes: [],
+        comments: [],
+      });
+
+      for (let j = 0; j < NUM_USERS / 2; j++) {
+        post.likes.push(users[randomNum(NUM_USERS)].id);
+      }
+
+      posts.push(post);
+      users[userIndex].posts.push(post.id);
+      await users[userIndex].save();
+    }
+
+    await Post.insertMany(posts);
+    console.log(`${NUM_POSTS_PER_USER} posts seeded successfully.`);
+
+    const comments = [];
+    for (let i = 0; i < NUM_COMMENTS_PER_POST; i++) {
+      const postIndex = randomNum(NUM_POSTS_PER_USER);
+
+      const comment = new Comment({
+        author: users[randomNum(NUM_USERS)].id,
+        post: posts[postIndex].id,
+        content: faker.lorem.sentence(),
+        likes: [],
+      });
+
+      for (let j = 0; j < NUM_USERS / 2; j++) {
+        comment.likes.push(users[randomNum(NUM_USERS)].id);
+      }
+
+      comments.push(comment);
+      posts[postIndex].comments.push(comment.id);
+      await posts[postIndex].save();
+    }
+
+    await Comment.insertMany(comments);
+    console.log(`${NUM_COMMENTS_PER_POST} comments seeded successfully.`);
   } catch (error) {
     console.error('Error seeding data:', error);
   } finally {
