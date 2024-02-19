@@ -6,9 +6,10 @@ Check out the [client-side repo](https://github.com/LaythAlqadhi/odin-book-clien
 Check out the web application [Odinbook](odinbook-eight.vercel.app) to explore its features.
 
 ## Routers
-- auth router
-- users router
-- posts router
+- Index router
+- Auth router
+- Users router
+- Posts router
 
 ## Models
 - User
