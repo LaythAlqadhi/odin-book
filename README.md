@@ -3,7 +3,7 @@ This this a social media web application built using the MERN stack (MongoDB, Ex
 Check out the [client-side repo](https://github.com/LaythAlqadhi/odin-book-client-side).
 
 ## Preview
-Check out the web application [Odinbook](odinbook-eight.vercel.app) to explore its features.
+Check out the web application [Odinbook](https://odinbook-eight.vercel.app) to explore its features.
 
 ## Routers
 - Index router
