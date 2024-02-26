@@ -17,13 +17,13 @@ Check out the web application [Odinbook](https://odinbook-eight.vercel.app) to e
 - Comment
 
 ## Features
-- Designed using RESTful architectural style.
-- Preventing unauthenticated users from accessing private routes.
-- Using Cloudinary and Multer to upload images and videos with validations to prevent unknown file types and oversized files.
-- Authenticating users using the Passport-GitHub2 strategy.
-- Validating and sanitizing client data using Express-validator.
-- Using sessions to ensure that all operations will either succeed or fail.
-- Using Faker.js to create seeds.
+- Implemented RESTful architectural style for streamlined communication.
+- Enhanced security by restricting access to private routes for unauthenticated users.
+- Integrated Cloudinary and Multer for uploading images and videos, with validation to ensure file type and size compliance.
+- Authenticated users via the Passport-GitHub2 strategy for reliable identification.
+- Ensured data integrity through validation and sanitization of client data using Express-validator.
+- Implemented session management to guarantee transactional integrity.
+- Utilized Faker.js for generating seed data, ensuring a consistent testing environment.
 
 ## Installation
 
